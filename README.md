@@ -39,3 +39,7 @@ I found really interesting the ability to inject sort-of-plugin inside the deleg
 ## Unit Test
 
 The class comes with a unit test coverage (using [Kiwi](https://github.com/allending/Kiwi)). In order to have Kiwi and run the test you may want to run `pod install` and open the workspace (instead of the project file).
+
+## License
+
+LBDelegateMatrioska is available under the MIT license. See the LICENSE file for more info.
