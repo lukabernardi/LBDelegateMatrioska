@@ -38,7 +38,7 @@
 
 - (NSArray *)delegates
 {
-    return [self.mutableDelegates copy];
+    return [self.mutableDelegates allObjects];
 }
 
 #pragma mark - NSProxy
