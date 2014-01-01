@@ -40,7 +40,7 @@ describe(@"The delegate matrioska", ^{
     id secondObject = [TestDelegateSelect mock];
     id thirdObject  = [TestDelegateDeselect mock];
     
-    LBDelegateMatrioska *matrioska = [[LBDelegateMatrioska alloc] initWithDelegates:@[firstObject, secondObject, thirdObject]];
+    __block LBDelegateMatrioska *matrioska = [[LBDelegateMatrioska alloc] initWithDelegates:@[firstObject, secondObject, thirdObject]];
 
     context(@"when created", ^{
         it(@"return a valid instance", ^{
@@ -54,17 +54,17 @@ describe(@"The delegate matrioska", ^{
     context(@"when asked if respond to an implemented selector", ^{
         it(@"should respond YES", ^{
             BOOL respondToDidSelect = [matrioska respondsToSelector:@selector(didSelect)];
-            [[theValue(respondToDidSelect) should] beYes];
+            [[@(respondToDidSelect) should] beYes];
             
             BOOL respondToDidDeselect = [matrioska respondsToSelector:@selector(didDeselect)];
-            [[theValue(respondToDidDeselect) should] beYes];
+            [[@(respondToDidDeselect) should] beYes];
         });
     });
     
     context(@"when asked if respond to a not implemented selector", ^{
         it(@"should respond to NO", ^{
             BOOL respondToDidNotExist = [matrioska respondsToSelector:@selector(didNotExist)];
-            [[theValue(respondToDidNotExist) should] beNo];
+            [[@(respondToDidNotExist) should] beNo];
         });
     });
     
