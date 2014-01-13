@@ -49,20 +49,20 @@
     // otherwise I just invoke it on the first delegate that
     // respond to the given selector
     if ([invocation methodReturnTypeIsVoid]) {
-        for (id delegate in self.delegates) {
+        for (id delegate in self.mutableDelegates) {
             if ([delegate respondsToSelector:invocation.selector]) {
                 [invocation invokeWithTarget:delegate];
             }
         }
     } else {
-        id firstResponder = [self _firstResponderToSelector:invocation.selector];
+        id firstResponder = [self p_firstResponderToSelector:invocation.selector];
         [invocation invokeWithTarget:firstResponder];
     }
 }
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
 {
-    id firstResponder = [self _firstResponderToSelector:sel];
+    id firstResponder = [self p_firstResponderToSelector:sel];
     if (firstResponder) {
         return [firstResponder methodSignatureForSelector:sel];
     }
@@ -73,44 +73,36 @@
 
 - (BOOL)respondsToSelector:(SEL)aSelector
 {
-    id firstResponder = [self _firstResponderToSelector:aSelector];
+    id firstResponder = [self p_firstResponderToSelector:aSelector];
     return (firstResponder ? YES : NO);
 }
 
 - (BOOL)conformsToProtocol:(Protocol *)aProtocol
 {
-    id firstConformed = [self _firstConformedToProtocol:aProtocol];
+    id firstConformed = [self p_firstConformedToProtocol:aProtocol];
     return (firstConformed ? YES : NO);
 }
 
-#pragma mark -
+#pragma mark - Private
 
-- (id)_firstResponderToSelector:(SEL)aSelector
+- (id)p_firstResponderToSelector:(SEL)aSelector
 {
-    __block id firstResponder = nil;
-    
-    NSArray *delegates = [_mutableDelegates allObjects];
-
-    [delegates enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([obj respondsToSelector:aSelector]) {
-            firstResponder = obj;
-            *stop = YES;
+    for (id delegate in self.mutableDelegates) {
+        if ([delegate respondsToSelector:aSelector]) {
+            return delegate;
         }
-    }];
-    
-    return firstResponder;
+    }
+    return nil;
 }
 
-- (id)_firstConformedToProtocol:(Protocol *)protocol
+- (id)p_firstConformedToProtocol:(Protocol *)protocol
 {
-    __block id firstConformed = nil;
-    [[self.mutableDelegates allObjects] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([obj conformsToProtocol:protocol]) {
-            firstConformed = obj;
-            *stop = YES;
+    for (id delegate in self.mutableDelegates) {
+        if ([delegate conformsToProtocol:protocol]) {
+            return delegate;
         }
-    }];
-    return firstConformed;
+    }
+    return nil;
 }
 
 @end
