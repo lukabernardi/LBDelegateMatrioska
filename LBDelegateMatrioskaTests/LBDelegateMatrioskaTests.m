@@ -36,18 +36,62 @@
 SPEC_BEGIN(LBDelegateMatrioskaSpec)
 
 describe(@"The delegate matrioska", ^{
+
     id firstObject  = [TestDelegateSelect mock];
     id secondObject = [TestDelegateSelect mock];
     id thirdObject  = [TestDelegateDeselect mock];
     
-    __block LBDelegateMatrioska *matrioska = [[LBDelegateMatrioska alloc] initWithDelegates:@[firstObject, secondObject, thirdObject]];
+    __block LBDelegateMatrioska *matrioska;
 
+    beforeEach(^{
+        matrioska =  [[LBDelegateMatrioska alloc] initWithDelegates:@[firstObject, secondObject, thirdObject]];
+    });
+    
     context(@"when created", ^{
         it(@"return a valid instance", ^{
             [matrioska shouldNotBeNil];
         });
         it(@"should contain the object", ^{
             [[matrioska.delegates should] haveCountOf:3];
+        });
+    });
+    
+    context(@"after creation", ^{
+
+        __block LBDelegateMatrioska *emptyMatrioska;
+        beforeEach(^{
+            emptyMatrioska = [[LBDelegateMatrioska alloc] initWithDelegates:nil];
+        });
+        
+        it(@"should be possible to add more delegate", ^{
+            NSUInteger currentCount = emptyMatrioska.delegates.count;
+            
+            [emptyMatrioska addDelegate:firstObject];
+            [[emptyMatrioska.delegates should] haveCountOf:(currentCount + 1)];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+            SEL testSelector = @selector(didSelect);
+            [[firstObject should] receive:testSelector];
+            [(id <CannedProtocol>)emptyMatrioska performSelector:testSelector];
+#pragma clang diagnostic pop
+        });
+        
+        it(@"should be possible to remove a delegate", ^{
+            
+            [emptyMatrioska addDelegate:firstObject];
+            [emptyMatrioska addDelegate:secondObject];
+            NSUInteger currentCount = emptyMatrioska.delegates.count;
+            
+            [emptyMatrioska removeDelegate:firstObject];
+            
+            [[emptyMatrioska.delegates should] haveCountOf:(currentCount - 1)];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+            SEL testSelector = @selector(didSelect);
+            [[firstObject shouldNot] receive:testSelector];
+            [[secondObject should] receive:testSelector];
+            [(id <CannedProtocol>)emptyMatrioska performSelector:testSelector];
+#pragma clang diagnostic pop
         });
     });
     
@@ -60,6 +104,7 @@ describe(@"The delegate matrioska", ^{
             [[@(respondToDidDeselect) should] beYes];
         });
     });
+    
     
     context(@"when asked if respond to a not implemented selector", ^{
         it(@"should respond to NO", ^{
@@ -106,7 +151,7 @@ describe(@"The delegate matrioska", ^{
             [(id <CannedProtocol>)matrioska performSelector:testSelector];
         });
     });
-    
+
 });
 
 SPEC_END

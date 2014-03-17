@@ -28,7 +28,6 @@
 - (instancetype)initWithDelegates:(NSArray *)delegates
 {
     _mutableDelegates = [NSPointerArray weakObjectsPointerArray];
-    
     [delegates enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         [_mutableDelegates addPointer:(void *)obj];
     }];
@@ -36,9 +35,33 @@
     return self;
 }
 
+
+#pragma mark - Public interface
+
 - (NSArray *)delegates
 {
     return [self.mutableDelegates allObjects];
+}
+
+
+- (void)addDelegate:(id)aDelegate
+{
+    NSParameterAssert(aDelegate);
+    [self.mutableDelegates addPointer:(void *)aDelegate];
+}
+
+- (void)removeDelegate:(id)aDelegate
+{
+    NSParameterAssert(aDelegate);
+    
+    NSUInteger index = 0;
+    for (id delegate in self.mutableDelegates) {
+        if (delegate == aDelegate) {
+            [self.mutableDelegates removePointerAtIndex:index];
+            break;
+        }
+        index++;
+    }
 }
 
 #pragma mark - NSProxy
