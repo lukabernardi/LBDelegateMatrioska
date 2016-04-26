@@ -8,7 +8,7 @@ This class is a subclass of `NSProxy` subclass that allows you to have multiple 
 You can init an `LBDelegateMatrioska` object with as many delegate objects you want
 
 ```
-LBDelegateMatrioska *matrioska = [[LBDelegateMatrioska alloc] initWithDelegates:@[mapClusterDelegate, self]];
+LBDelegateMatrioska LB_GENERICS(id<MKMapViewDelegate>) *matrioska = [[LBDelegateMatrioska alloc] initWithDelegates:@[mapClusterDelegate, self]];
 ```
 
 and the add this object as delegate

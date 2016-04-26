@@ -8,18 +8,26 @@
 
 #import <Foundation/Foundation.h>
 
+#if __has_feature(objc_generics)
+#define LB_GENERICS(placeholder) <placeholder>
+#define LB_GENERICS_TYPE(placeholder) placeholder
+#else
+#define LB_GENERICS(placeholder)
+#define LB_GENERICS_TYPE(placeholder) id
+#endif
+
 @interface NSInvocation (ReturnType)
 - (BOOL)methodReturnTypeIsVoid;
 @end
 
 
-@interface LBDelegateMatrioska : NSProxy
+@interface LBDelegateMatrioska LB_GENERICS(T) : NSProxy
 
-@property (readonly, nonatomic, strong) NSArray *delegates;
+@property (nonatomic, readonly, copy) NSArray LB_GENERICS(T) *delegates;
 
-- (instancetype)initWithDelegates:(NSArray *)delegates;
+- (instancetype)initWithDelegates:(NSArray LB_GENERICS(T) *)delegates;
 
-- (void)addDelegate:(id)delegate;
-- (void)removeDelegate:(id)delegate;
+- (void)addDelegate:(LB_GENERICS_TYPE(T))delegate;
+- (void)removeDelegate:(LB_GENERICS_TYPE(T))delegate;
 
 @end
